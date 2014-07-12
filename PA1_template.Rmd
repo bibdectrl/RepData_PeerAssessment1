@@ -69,6 +69,8 @@ missing.vals <- sum(is.na(activity$steps))
 
 The number of missing values in the data is ***`r missing.vals`***.
 
+The method of imputing the missing values was to use the mean value for each time interval for each missing value.
+
 ```{r, echo=TRUE}
 
 #define a function to return the mean number of steps for a given time interval
@@ -78,7 +80,6 @@ get.mean <- function(interval) {
 
 #define a function to insert imputed steps into a new column
 impute.steps <- function(act) {
-
   steps <- act$steps
   intervals <- act$interval
   imputed.steps <- c(1:length(steps))
@@ -92,14 +93,15 @@ impute.steps <- function(act) {
 imp.activity <- activity
 imp.activity$steps <- impute.steps(activity)
 
+#get total steps from imputed data and plot a histogram
+imp.daily.steps <- aggregate(FUN = sum, x = imp.activity$steps, by = list(imp.activity$date), na.rm = TRUE)
+imp.daily.steps <- setNames(imp.daily.steps, c("Date", "Total.Steps"))
+hist(imp.daily.steps$Total.Steps, breaks = 20, xlab = "total steps", main = "Daily Total Steps")
+
 ```
 
 
 ```{r, echo=TRUE}
-
-imputed.interval.mean <- aggregate(FUN = mean, imp.activity$steps,  by = list(imp.activity$interval), na.rm = TRUE)
-imputed.interval.mean <- setNames(imputed.interval.mean, c("Interval", "Mean.Steps"))
-
 
 #time plot with imputed steps
 imputed.mean.interval.steps <- aggregate(FUN = mean, x = imp.activity$steps, by = list(activity$interval), na.rm = TRUE)
@@ -124,6 +126,7 @@ weekend.means <- aggregate(FUN = mean, x = activity$steps[weekend.days], by = li
 weekday.means <- aggregate(FUN = mean, x = activity$steps[weekday.days], by = list(activity$interval[weekday.days]), na.rm = TRUE)
 
 #plot the mean values
+par(mfrow=c(2, 1))
 plot(weekend.means, type = "l", col = "Blue", main = "Mean steps for each time interval, weekend", xlab = "Time Interval", ylab = "Mean Steps")
 plot(weekday.means, type = "l", col = "Blue", main = "Mean steps for each time interval, weekday", xlab = "Time Interval", ylab = "Mean Steps")
 
@@ -136,6 +139,7 @@ imp.activity$day <- ifelse(weekdays(as.Date(imp.activity$date)) %in% c("Saturday
 imp.activity$day <- as.factor(imp.activity$day)
 imp.weekend.means <- aggregate(FUN = mean, x = imp.activity$steps[weekend.days], by = list(imp.activity$interval[weekend.days]))
 imp.weekday.means <- aggregate(FUN = mean, x = imp.activity$steps[weekday.days], by = list(imp.activity$interval[weekday.days]))
+par(mfrow=c(2, 1))
 plot(imp.weekend.means, type = "l", col = "Blue", main = "Mean steps for each time interval, with imputed data, weekend", xlab = "Time Interval", ylab = "Mean Steps")
 plot(imp.weekday.means, type = "l", col = "Blue", main = "Mean steps for each time interval, with imputed data, weekday", xlab = "Time Interval", ylab = "Mean Steps")
 

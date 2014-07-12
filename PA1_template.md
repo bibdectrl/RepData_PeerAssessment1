@@ -74,6 +74,8 @@ missing.vals <- sum(is.na(activity$steps))
 
 The number of missing values in the data is ***2304***.
 
+The method of imputing the missing values was to use the mean value for each time interval for each missing value.
+
 
 ```r
 #define a function to return the mean number of steps for a given time interval
@@ -83,7 +85,6 @@ get.mean <- function(interval) {
 
 #define a function to insert imputed steps into a new column
 impute.steps <- function(act) {
-
   steps <- act$steps
   intervals <- act$interval
   imputed.steps <- c(1:length(steps))
@@ -96,15 +97,18 @@ impute.steps <- function(act) {
 #create a data frame and update the steps values to contain imputed data
 imp.activity <- activity
 imp.activity$steps <- impute.steps(activity)
+
+#get total steps from imputed data and plot a histogram
+imp.daily.steps <- aggregate(FUN = sum, x = imp.activity$steps, by = list(imp.activity$date), na.rm = TRUE)
+imp.daily.steps <- setNames(imp.daily.steps, c("Date", "Total.Steps"))
+hist(imp.daily.steps$Total.Steps, breaks = 20, xlab = "total steps", main = "Daily Total Steps")
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
 
 
 ```r
-imputed.interval.mean <- aggregate(FUN = mean, imp.activity$steps,  by = list(imp.activity$interval), na.rm = TRUE)
-imputed.interval.mean <- setNames(imputed.interval.mean, c("Interval", "Mean.Steps"))
-
-
 #time plot with imputed steps
 imputed.mean.interval.steps <- aggregate(FUN = mean, x = imp.activity$steps, by = list(activity$interval), na.rm = TRUE)
 imputed.mean.interval.steps <- setNames(imputed.mean.interval.steps, c("Interval", "Mean.Steps"))
@@ -130,16 +134,12 @@ weekend.means <- aggregate(FUN = mean, x = activity$steps[weekend.days], by = li
 weekday.means <- aggregate(FUN = mean, x = activity$steps[weekday.days], by = list(activity$interval[weekday.days]), na.rm = TRUE)
 
 #plot the mean values
+par(mfrow=c(2, 1))
 plot(weekend.means, type = "l", col = "Blue", main = "Mean steps for each time interval, weekend", xlab = "Time Interval", ylab = "Mean Steps")
-```
-
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-71.png) 
-
-```r
 plot(weekday.means, type = "l", col = "Blue", main = "Mean steps for each time interval, weekday", xlab = "Time Interval", ylab = "Mean Steps")
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-72.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
 
 ###Now with imputed data...
 
@@ -149,16 +149,12 @@ imp.activity$day <- ifelse(weekdays(as.Date(imp.activity$date)) %in% c("Saturday
 imp.activity$day <- as.factor(imp.activity$day)
 imp.weekend.means <- aggregate(FUN = mean, x = imp.activity$steps[weekend.days], by = list(imp.activity$interval[weekend.days]))
 imp.weekday.means <- aggregate(FUN = mean, x = imp.activity$steps[weekday.days], by = list(imp.activity$interval[weekday.days]))
+par(mfrow=c(2, 1))
 plot(imp.weekend.means, type = "l", col = "Blue", main = "Mean steps for each time interval, with imputed data, weekend", xlab = "Time Interval", ylab = "Mean Steps")
-```
-
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-81.png) 
-
-```r
 plot(imp.weekday.means, type = "l", col = "Blue", main = "Mean steps for each time interval, with imputed data, weekday", xlab = "Time Interval", ylab = "Mean Steps")
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-82.png) 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
 
 It certainly looks like there are differences between the weekend and weekdays, in terms of walking activity, with the weekend generally being more active, but starting later, than during the week.
 
