@@ -2,19 +2,44 @@
 
 
 ## Loading and preprocessing the data
-
-
-
+```{r}
+activity <- read.csv("activity.csv")
+options("scipen"=100, "digits" = 2)
+```
 ## What is mean total number of steps taken per day?
+```{r}
+steps.per.day <- aggregate(FUN = sum, x = activity$steps, by = list(activity$date), na.rm = TRUE)
+```
 
-
+The mean number of steps per day is `r sum(steps.per.day$x, na.rm=TRUE) / 61 `
 
 ## What is the average daily activity pattern?
+```{r}
+plot(steps.per.day, xlab = "Date", ylab = "Steps", main = "Steps Per Day")
 
-
+hist(steps.per.day$x, xlab = "Steps", main = "Steps Per Day")
+```
 
 ## Imputing missing values
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+steps.per.day$day.of.week <- weekdays(as.Date(steps.per.day$Group.1))
+
+weekend <- subset(steps.per.day, day.of.week %in% c("Saturday", "Sunday"))
+weekdays <- subset(steps.per.day, ! day.of.week %in%  c("Saturday", "Sunday"))
+
+hist(weekend$x)
+hist(weekdays$x)
+weekend.mean <- mean(weekend$x)
+weekday.mean <- mean(weekdays$x)
+
+```
+
+The mean number of steps during weekdays is `r weekday.mean`, while the mean number of steps on the weekend is `r weekend.mean`.
+
+
+
