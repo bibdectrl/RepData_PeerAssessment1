@@ -1,19 +1,43 @@
 # Reproducible Research: Peer Assessment 1
 
+Data collected from a personal device that keeps track of how many steps an individual takes can offer interesting insight into their patterns of activity over time. In this case, the data was collected over the period from 2012-10-01 to 2012-11-30. Some of the data was missing, and was imputed in order to create a complete set.
 
 ## Loading and preprocessing the data
 ```{r}
+echo = TRUE
 activity <- read.csv("activity.csv")
 options("scipen"=100, "digits" = 2)
+
+#plot(x=activity$interval, y=activity$steps, type="l")
+
+
+# divide into weekend vs. weekday
+activity$day <- ifelse(weekdays(as.Date(activity$date)) %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+activity$day <- as.factor(activity$day)
+plot(x=activity$interval[activity$day == "Weekend"], y=activity$steps[activity$day == "Weekend"], type="l")
+plot(x=activity$interval[activity$day == "Weekday"], y=activity$steps[activity$day == "Weekday"], type="l")
 ```
+
 ## What is mean total number of steps taken per day?
+
 ```{r}
 steps.per.day <- aggregate(FUN = sum, x = activity$steps, by = list(activity$date), na.rm = TRUE)
+steps.per.day$day
+
+
 ```
 
 The mean number of steps per day is `r sum(steps.per.day$x, na.rm=TRUE) / 61 `
 
 ## What is the average daily activity pattern?
+
+
+### Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+interval.mean <- aggregate(FUN = mean, activity$steps,  by = list(activity$interval), na.rm = TRUE)
+max.mean.interval.step <- interval.mean[which.max(x = interval.mean$x),]
+
 ```{r}
 plot(steps.per.day, xlab = "Date", ylab = "Steps", main = "Steps Per Day")
 
@@ -21,7 +45,22 @@ hist(steps.per.day$x, xlab = "Steps", main = "Steps Per Day")
 ```
 
 ## Imputing missing values
+```{r}
 
+get.mean.value <- function(dat, col){
+  
+  
+}
+
+fill.in.data <- function(dat) {
+  
+  # if dat value is null, insert mean
+  
+}
+
+
+
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?

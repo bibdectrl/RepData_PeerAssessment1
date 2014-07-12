@@ -1,0 +1,27 @@
+Goofing Around
+==============
+
+```{r computetime, echo=FALSE}
+time <- format(Sys.time(), "%a %b %d %X %Y");
+num <- rnorm(1);
+
+```
+
+The current time is `r time`.
+Here is a random number `r num`.
+
+
+plot(x=activity$interval, y=activity$steps, type="l")
+
+weekend.activity <- subset(activity, weekdays(as.Date(activity$date)) %in% c("Saturday", "Sunday"))
+weekday.activity <- subset(activity, ! weekdays(as.Date(activity$date)) %in% c("Saturday", "Sunday"))
+
+plot(x=weekend.activity$interval, y=weekend.activity$steps, type="l")
+plot(x=weekday.activity$interval, y=weekday.activity$steps, type="l")
+
+
+activity$day <- ifelse(weekdays(as.Date(activity$date)) %in% c("Saturday", "Sunday"), "Weekend", "Weekday")
+activity$day <- as.factor(activity$day)
+
+plot(x=activity$interval[activity$day == "Weekend"], y=activity$steps[activity$day == "Weekend"], type="l")
+plot(x=activity$interval[activity$day == "Weekday"], y=activity$steps[activity$day == "Weekday"], type="l")
